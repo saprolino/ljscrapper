@@ -17,8 +17,8 @@ Scrapper for LiveJournal blogs (it only scraps articles' titles and dates).
   - id of any article (like in url: blogname.livejournal.com/**1337**.html)
 - Run script in console with `python3 main.py` and follow instructions
 
-## Examples
-
+## Example
+[Here](https://saprolino.github.io/ljscrapper.html)
 
 ## TODO
 - Add tags scrapping
