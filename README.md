@@ -1,26 +1,34 @@
 # ljscrapper
-Scrapper for LiveJournal blogs (it only scraps articles' titles and dates).
+Парсер для ЖЖ (Живого журнала)
+Скрипт собирает список статей блога (название статьи и дата публикации) в json-файл
 
-## Details
-- Since LJ doesn't have a proper API, this tool can be useful if you are carefully reading some blogs.
-- Right now this script only stores its data in {blogname}.json file per blog
-
-## Requirements
+## Требования
 - python3
-- libraries:
+- библиотеки:
   - bs4
   - requests
 
-## How to
-- To start you need to know:
-  - blog name (like in url: **blogname**.livejournal.com)
-  - id of any article (like in url: blogname.livejournal.com/**1337**.html)
-- Run script in console with `python3 main.py` and follow instructions
+## Как использовать
+- Запустите main.py (что-то вроде `python3 main.py`
+- Скрипт попросит:
+  - Название блога (blogname для **blogname**.livejournal.com)
+  - ID какой-нибудь статьи из него (1337 для blogname.livejournal.com/**1337**.html)
+- После этого начнется парсинг. В процессе скрипт выводит в одну строку:
+  - количество статей в базе (сколько всего статей в нужном блоге, можно узнать тут: blogname.livejournal.com/profile)
+  - ID статьи
+  - время публикации записи
+  - заголовок
+- В конце в папке со скриптом появится файл с названием blogname.json
 
-## Example
-[Here](https://saprolino.github.io/ljscrapper.html)
+## Разные моменты
+- Если в блоге много статей, парсинг может идти долго
+- Если процесс оборвался, при следующем запуске скрипт продолжит работу с последнего сохраненного момента. На всякий случай все автоматически сохраняется каждые 200 статей
+- Статья может быть недоступна по ряду причин:
+  - Статья была заблокирована местными органами (Error 451. The page is blocked due to the decision of the authorities in your area.) - тогда она будет сохранена с полями "title": "NA", "date": "NA"
+  - Статья 18+ - скрипт обходит такие блокировки, все ок
 
 ## TODO
-- Add tags scrapping
-- Add conversion to html-page with all the links
-- Add DB support
+- **Добавить пример**
+- Добавить извлечение тегов
+- Добавить автоматическое сохранение в HTML
+- Добавить сохранение в DB вместо json
