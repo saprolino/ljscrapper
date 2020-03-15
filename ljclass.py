@@ -1,10 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
+import jinja2
+import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # https://www.livejournal.com/go.bml?journal={}&itemid={}}&dir=prev
 # https://www.livejournal.com/go.bml?journal={}&itemid={}}&dir=next
+
 
 class Blog:
     def __init__(self, blogname=None):
@@ -14,6 +18,8 @@ class Blog:
         # self.url_lj_template = "https://{}.livejournal.com/{}.html"
         # self.url_domain_template = "https://{}/{}.html"
         self.url_template = "https://{}.livejournal.com/{}.html"
+        self.last_updated = None
+        self.size = None
         self.ssl_enabled = False if "." in self.blogname else True
         self.url_prev_template = "https://www.livejournal.com/go.bml?journal={}&itemid={}&dir=prev"
         self.url_next_template = "https://www.livejournal.com/go.bml?journal={}&itemid={}&dir=next"
@@ -42,6 +48,19 @@ class Blog:
             tags = []
         self.articles[str(id)] = {"title": title, "date": date, "tags": tags}
         return "{} {} {} {}".format(id, date, title, tags)
+
+    def getSomeId(self):
+        if "." in self.blogname:
+            url = 'https://' + self.blogname
+            pattern = self.blogname + "\/[0-9]+\.html"
+        else:
+            url = 'https://' + self.blogname + '.livejournal.com'
+            pattern = self.blogname + "\.livejournal\.com\/[0-9]+\.html"
+
+        page = requests.get(url).text
+        m = re.search(pattern, page).group()
+        id = m.split("/")[-1][:-5]
+        return id
 
     def getPreviousId(self, id):
         requestUrl = self.url_prev_template.format(self.blogname, id)
@@ -72,7 +91,10 @@ class Blog:
         print("There are {} articles in your data".format(len(self.articles)))
 
     def retrieveFromNewest(self, id, up_to=-1):
-        current_id = id
+        if id == -1:
+            current_id = self.getSomeId()
+        else:
+            current_id = id
         next_id = self.getNextId(current_id)
         while current_id and up_to:
             page = self.parse(current_id)
@@ -81,14 +103,16 @@ class Blog:
             up_to -= 1
 
     def saveToFile(self, filename):
+        self.last_updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.size = len(self.articles)
         with open(filename, 'w', encoding='utf8') as fp:
-            json.dump({"blogname": self.blogname, "data": self.articles}, fp, ensure_ascii=False, sort_keys=True,
+            json.dump({"blogname": self.blogname, "size": self.size, "updated": self.last_updated, "articles": self.articles}, fp, ensure_ascii=False, sort_keys=True,
                       indent=4)
 
     def readFromFile(self, filename):
         with open(filename, 'r', encoding='utf8') as fp:
             data = json.load(fp)
-            self.blogname, self.articles = data["blogname"], data["data"]
+            self.blogname, self.articles = data["blogname"], data["articles"]
             self.ssl_enabled = False if "." in self.blogname else True
             self.shift = 16 + len(self.blogname)
 

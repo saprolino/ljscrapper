@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+import os
 from ljclass import *
 import sys
 import requests
@@ -38,9 +38,9 @@ try:
 	a = Blog()
 except FileNotFoundError:
 	print("File doesn't exist, making a new one ({})...".format(location))
-	id = input("Input some article's id: ")
+	#id = input("Input some article's id: ")
 	a = Blog(blogname)
-	a.retrieveFromNewest(id, 1)
+	a.retrieveFromNewest(-1, 1)
 	a.saveToFile(location)
 
 a.readFromFile(location)
