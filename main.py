@@ -48,10 +48,16 @@ a.readFromFile(location)
 #52504
 
 while a.anyOlder():
+	print("\n")
+	a.getState()
+	print("\n")
 	a.retrieveDown(chunk_size)
 	a.saveToFile(location)
 
 while a.anyNewer():
+	print("\n")
+	a.getState()
+	print("\n")
 	a.retrieveUp(chunk_size)
 	a.saveToFile(location)
 

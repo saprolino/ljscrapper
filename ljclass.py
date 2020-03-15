@@ -40,7 +40,12 @@ class Blog:
         soup = BeautifulSoup(data, features="html.parser")
         title = soup.title.string[:-self.shift].rstrip()
         date = soup.findAll("time", {"class": "b-singlepost-author-date published dt-published"})
-        date = date[0].getText()
+        if not len(date):
+            date = soup.findAll("p", {"class": "aentry-head__date"})[0].getText().strip()
+            date = datetime.datetime.strptime(date, "%B %d %Y, %H:%M")
+            date = date.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            date = date[0].getText()
         tags = soup.findAll("span", {"class": "b-singlepost-tags-items"})
         if len(tags):
             tags = list(map(str.strip, tags[0].getText().split(", ")))
@@ -81,7 +86,7 @@ class Blog:
     def retrieveFromOldest(self, id, up_to=-1):
         current_id = id
         prev_id = self.getPreviousId(current_id)
-        while current_id and up_to:
+        while current_id and up_to>=0:
             page = self.parse(current_id)
             current_id, prev_id = prev_id, self.getPreviousId(prev_id)
             print(page)
@@ -96,7 +101,7 @@ class Blog:
         else:
             current_id = id
         next_id = self.getNextId(current_id)
-        while current_id and up_to:
+        while current_id and up_to>=0:
             page = self.parse(current_id)
             current_id, next_id = next_id, self.getNextId(next_id)
             print(page)
