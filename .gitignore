@@ -2,3 +2,4 @@
 /html/*.html
 /.idea/
 /__pycache__/
+/.gitignore
