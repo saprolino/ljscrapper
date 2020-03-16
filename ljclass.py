@@ -38,6 +38,13 @@ class Blog:
         page = requests.get(the_url, cookies=cookies_jar, verify=self.ssl_enabled)
         data = page.text
         soup = BeautifulSoup(data, features="html.parser")
+        if page.status_code == 404:
+            title = soup.title.string.strip()
+            date = "NA"
+            tags = ""
+            self.articles[str(id)] = {"title": title, "date": date, "tags": tags}
+            return "{} {} {}".format(id, date , title, tags)
+        
         title = soup.title.string[:-self.shift].rstrip()
         date = soup.findAll("time", {"class": "b-singlepost-author-date published dt-published"})
         if not len(date):
@@ -124,19 +131,19 @@ class Blog:
     def anyNewer(self):
         if len(self.articles) == 0:
             return True
-        newest = max(self.articles, key=lambda i: self.articles[i]["date"])
+        newest = max({key:content for  key,content in self.articles.items() if content["date"] != "NA"}, key=lambda i: self.articles[i]["date"])
         return bool(self.getNextId(newest))
 
     def anyOlder(self):
         if len(self.articles) == 0:
             return True
-        oldest = min(self.articles, key=lambda i: self.articles[i]["date"])
+        oldest = min({key:content for  key,content in self.articles.items() if content["date"] != "NA"}, key=lambda i: self.articles[i]["date"])
         return bool(self.getPreviousId(oldest))
 
     def retrieveDown(self, up_to=-1):  # takes the oldest article in self.articles and continues retrieving
-        current_id = min(self.articles, key=lambda i: self.articles[i]["date"])
+        current_id = min({key:content for  key,content in self.articles.items() if content["date"] != "NA"}, key=lambda i: self.articles[i]["date"])
         self.retrieveFromOldest(current_id, up_to)
 
     def retrieveUp(self, up_to=-1):  # takes the oldest article in self.articles and continues retrieving
-        current_id = max(self.articles, key=lambda i: self.articles[i]["date"])
+        current_id = max({key:content for  key,content in self.articles.items() if content["date"] != "NA"}, key=lambda i: self.articles[i]["date"])
         self.retrieveFromNewest(current_id, up_to)
