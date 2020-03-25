@@ -6,7 +6,9 @@ import sys
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from pathlib import Path
 
+Path("data").mkdir(parents=True, exist_ok=True)
 blogname = input("Input blogname: ")
 # blogname = "livejournal"
 
