@@ -3,3 +3,7 @@
 /.idea/
 /__pycache__/
 /.gitignore
+/htmlclass.py
+/json2html.py
+/html/
+/templates

@@ -5,7 +5,7 @@
     </head>
     <body>
         <div>
-            <h2>{{ data["blogname"] }}</h2>
+            <h2><a href="https://saprolino.github.com/ljscrapper.com">LJScrapper</a> > {{ data["blogname"] }}</h2>
             <span>
                 Постов в базе: {{ data["size"] }}<br>
                 Последнее обновление: {{ data["updated"] }}
@@ -16,7 +16,7 @@
                     {% set url = "https://"+ data["blogname"] + ".livejournal.com/" %}
                 {% endif %}
             <ul>
-                {% for id,details in data["articles"].items() %}
+                {% for id,details in data["articles"].items()|sort(attribute="1.date",reverse=True) if details["date"] != "NA"%}
                 <li>
                     <span class="date">{{ details["date"] }}</span>
                     <span class="title">
